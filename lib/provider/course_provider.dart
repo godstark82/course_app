@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_final_fields
 
-import 'dart:collection';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:course_app/constants/db.dart';
 import 'package:course_app/models/course_model.dart';
@@ -11,14 +11,15 @@ final admin = FirebaseFirestore.instance.collection('admin');
 class CourseProvider extends ChangeNotifier {
   // variable for _courses in CourseModel
   List<Course> _courses = db.value['courses'] != null
-      ? (db.value['courses'] ?? [])
+      ? (db.value['courses'] as List)
           .map((course) => Course.fromJson(course))
+          .toSet()
           .toList()
       : [];
 
-  List<Course> get courses => _courses.toSet().toList();
+  List<Course> get courses => _courses;
 
-  Future<List<Course>> fetchCourses() async {
+  Future<bool> fetchCourses() async {
     _courses.clear();
     final query = await FirebaseFirestore.instance.collection('courses').get();
     final docs = query.docs;
@@ -26,12 +27,13 @@ class CourseProvider extends ChangeNotifier {
       final jsonString = docs[i].data();
 
       Course course = Course.fromJson(jsonString);
+
       _courses.add(course);
     }
-    final fetchedCourses = LinkedHashSet<Course>.from(_courses).toList();
-    fetchedCourses.sort((a, b) => a.creationTime.compareTo(b.creationTime));
+    _courses.toSet().toList();
+    _courses.sort((a, b) => a.creationTime.compareTo(b.creationTime));
+    log('Course Fetched: ${courses.length}');
     notifyListeners();
-
-    return fetchedCourses;
+    return true;
   }
 }

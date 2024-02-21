@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_final_fields
+// ignore_for_file: prefer_final_fields, avoid_print
 
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:course_app/constants/db.dart';
 import 'package:course_app/models/carousel_model.dart';
@@ -26,6 +27,7 @@ class CarouselProvider extends ChangeNotifier {
       CarouselModel carouselModel = CarouselModel.fromJson(jsonString);
       _carousels.add(carouselModel);
     }
+    log('Carousel Fetched ${carousels.length}');
     final fetchedCarousels =
         LinkedHashSet<CarouselModel>.from(_carousels).toList();
     notifyListeners();

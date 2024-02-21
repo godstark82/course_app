@@ -1,0 +1,33 @@
+import 'package:course_app/models/course_model.dart';
+import 'package:course_app/screens/views/chapter_view.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class ViewChaptersList extends StatelessWidget {
+  const ViewChaptersList({super.key, required this.subject});
+  final Subject subject;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(subject.name),
+      ),
+      body: ListView.builder(
+          itemCount: subject.chapters?.length,
+          itemBuilder: (context, index) => Card(
+                child: ListTile(
+                  onTap: () {
+                    Get.to(
+                        () => ChapterView(chapter: subject.chapters![index]));
+                  },
+                  leading: Text('${index + 1}'),
+                  title: Text(subject.chapters![index].name),
+                  subtitle: Text(
+                      '${subject.chapters?[index].lectures?.length} Leactures'),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+              )),
+    );
+  }
+}

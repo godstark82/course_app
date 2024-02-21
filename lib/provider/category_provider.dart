@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_final_fields
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:course_app/constants/db.dart';
 import 'package:course_app/models/category_model.dart';
@@ -24,6 +26,7 @@ class CategoryProvider extends ChangeNotifier {
       final category = Category.fromJson(jsonString);
       _categories.add(category);
     }
+    log('Category Fetched ${categories.length}');
     notifyListeners();
     return _categories;
   }
