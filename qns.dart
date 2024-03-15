@@ -1,11 +1,23 @@
 // ignore_for_file: avoid_print
 
-
-List<int> nums1 = [1, 2, 3, 4, 5, 6];
-List<int> nums2 = [7, 8, 9, 10, 11, 12];
-
-void main() {
-
+void main(List<String> args) {
+  factorial(4);
 }
 
+int fact(int n) {
+  if (n == 0) {
+    return 1;
+  } else {
+    return n * fact(n - 1);
+  }
+}
 
+void factorial(int n) {
+  int fact = 0;
+  for (int i = 0; i < n-1; i++) {
+    if (n != 0) {
+      fact += n * (n - 1);
+    }
+  }
+  print(fact);
+}

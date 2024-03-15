@@ -17,6 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return SignInScreen(
+      showPasswordVisibilityToggle: true,
+      headerMaxExtent: 150,
+      
       actions: [
         ForgotPasswordAction((context, email) {
           Get.toNamed('/forgot-password', arguments: {'email': email});

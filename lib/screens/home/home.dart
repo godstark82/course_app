@@ -1,15 +1,19 @@
-
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
+import 'package:course_app/constants/utils/utils.dart';
 import 'package:course_app/constants/widgets/skeleton_widget.dart';
 import 'package:course_app/provider/carousel_provider.dart';
 import 'package:course_app/provider/category_provider.dart';
-import 'package:course_app/provider/course_provider.dart';
-import 'package:course_app/screens/category/category_screen.dart';
+import 'package:course_app/provider/quiz_provider.dart';
+import 'package:course_app/provider/user_provider.dart';
 import 'package:course_app/screens/home/components/drawer.dart';
 import 'package:course_app/screens/home/home_screen.dart';
+import 'package:course_app/screens/quiz/quiz_screen.dart';
+import 'package:course_app/screens/study/study_screen.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,16 +26,35 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: GlobalKeys.homeScaffoldKey,
         appBar: AppBar(
-          title: const Text('Notepediax'),
+          title: ValueListenableBuilder(
+              valueListenable: selectedIndex,
+              builder: (context, value, child) {
+                if (value == 0) {
+                  return const Text('Notepediax').text.bold.make();
+                }
+                if (value == 1) {
+                  return const Text('Category').text.bold.make();
+                }
+                if (value == 2) {
+                  return const Text('Quizes').text.bold.make();
+                } else {
+                  return const Text('Profile').text.bold.make();
+                }
+              }),
           elevation: 2,
         ),
         drawer: const MyDrawer(),
         body: FutureBuilder(
             future: Future.wait([
-              context.read<CourseProvider>().fetchCourses(),
-              context.read<CategoryProvider>().fetchCategories(),
+              // Courses has been fetched in fetchUserCourses function
+              context.read<UserProvider>().fetchUserCourses(context),
+              // context.read<CourseProvider>().fetchCourses(),
               context.read<CarouselProvider>().fetchCarousel(),
+              context.read<CategoryProvider>().fetchCategories(),
+              context.read<QuizProvider>().fetchQuizes(),
+              context.read<QuizProvider>().fetchUserQuiz()
             ]),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -52,45 +75,68 @@ class _HomeState extends State<Home> {
             valueListenable: selectedIndex,
             builder: (context, value, child) {
               return BottomBarCreative(
+                  boxShadow: const [
+                    BoxShadow(blurRadius: 1, color: Colors.grey)
+                  ],
+                  enableShadow: true,
+                  isFloating: true,
+
+                  // backgroundSelected: Colors.red,
+                  // animated: true,
                   items: items,
                   backgroundColor: Colors.white,
                   color: Colors.black,
                   colorSelected: Colors.blue,
                   indexSelected: value,
-                  onTap: (newIndex) {
-                    selectedIndex.value = newIndex;
+                  onTap: (newIndex) async {
+                    if (newIndex == 2) {
+                      await Get.to(() => const StudyScreen());
+                      selectedIndex.value = 0;
+                    } else {
+                      selectedIndex.value = newIndex;
+                    }
                   });
             }));
   }
 
   List<Widget> screen = <Widget>[
     const HomeScreen(),
-    const CategoryScreen(),
-    const HomeScreen(),
-    const HomeScreen(),
-    const HomeScreen(),
+    const QuizScreen(isUserQuizes: false),
+    const StudyScreen(),
+    const QuizScreen(isUserQuizes: false),
+    const ProfileScreen()
   ];
-  ValueNotifier<int> selectedIndex = ValueNotifier(0);
+
   List<TabItem> items = [
     const TabItem(
       icon: Icons.home,
-      title: 'Home',
+      title: 'Batches',
     ),
     const TabItem(
-      icon: Icons.catching_pokemon,
+      icon: Icons.my_library_books,
       title: 'Category',
     ),
     const TabItem(
-      icon: FontAwesomeIcons.bookOpenReader,
-      title: 'Wishlist',
+      icon: Icons.library_books_outlined,
+      title: 'Study',
     ),
     const TabItem(
-      icon: Icons.shopping_cart_outlined,
-      title: 'Cart',
+      icon: Icons.quiz,
+      title: 'Quiz',
     ),
     const TabItem(
-      icon: Icons.account_box,
-      title: 'profile',
+      icon: Icons.person,
+      title: 'Profile',
     ),
   ];
 }
+
+ValueNotifier<int> selectedIndex = ValueNotifier(0);
+
+
+// Home
+// Courses
+/* Quiz
+   Notes
+   Store
+ */

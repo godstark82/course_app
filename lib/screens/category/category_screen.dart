@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:course_app/provider/category_provider.dart';
 import 'package:course_app/provider/course_provider.dart';
+import 'package:course_app/screens/category/components/courses_in_category.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -25,6 +27,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     final categories = context.watch<CategoryProvider>().categories;
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Categories'),
+        elevation: 1,
+        
+      ),
       body: ListView.builder(
           itemCount: categories.length,
           itemBuilder: (context, index) {
@@ -40,27 +47,48 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       style: const TextStyle(fontSize: 18),
                     ),
                   ),
-                  ListTile(
-                    leading: CachedNetworkImage(
-                      height: 60,
-                      width: 60,
-                      imageUrl: categories[0].img.toString(),
+                  Card(
+                    elevation: 2,
+                    margin: EdgeInsets.all(4),
+                    shape: LinearBorder.bottom(
+                        side: BorderSide(color: Colors.black)),
+                    child: ListTile(
+                      tileColor: Colors.white,
+                      leading: CachedNetworkImage(
+                        height: 60,
+                        width: 60,
+                        imageUrl: categories[0].img.toString(),
+                      ),
+                      onTap: () {
+                        Get.to(
+                            () => CategoryCourses(cateogry: categories[index]));
+                      },
+                      title: Text(categories[index].name.toString()),
+                      subtitle: Text(
+                          'Courses: ${getCoursesInCategory(categories[index].name)}'),
                     ),
-                    title: Text(categories[index].name.toString()),
-                    subtitle: Text(
-                        'Courses: ${getCoursesInCategory(categories[index].name)}'),
                   )
                 ],
               );
             } else {
-              return ListTile(
-                leading: CachedNetworkImage(
-                    height: 60,
-                    width: 60,
-                    imageUrl: categories[index].img.toString()),
-                title: Text(categories[index].name.toString()),
-                subtitle: Text(
-                    'Courses: ${getCoursesInCategory(categories[index].name)}'),
+              return Card(
+                elevation: 2,
+                margin: EdgeInsets.all(4),
+                shape:
+                    LinearBorder.bottom(side: BorderSide(color: Colors.black)),
+                child: ListTile(
+                  tileColor: Colors.white,
+                  leading: CachedNetworkImage(
+                      height: 60,
+                      width: 60,
+                      imageUrl: categories[index].img.toString()),
+                  title: Text(categories[index].name.toString()),
+                  onTap: () {
+                    Get.to(() => CategoryCourses(cateogry: categories[index]));
+                  },
+                  subtitle: Text(
+                      'Courses: ${getCoursesInCategory(categories[index].name)}'),
+                ),
               );
             }
           }),

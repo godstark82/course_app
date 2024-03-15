@@ -6,9 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flexivideoplayer/flexivideoplayer.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:get/get.dart';
-import 'package:velocity_x/velocity_x.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerView extends StatefulWidget {
@@ -229,7 +226,8 @@ class _VideoPlayerViewState extends State<VideoPlayerView>
                               Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                      builder: (context) => PdfViewPage()));
+                                      builder: (context) => PdfViewPage(
+                                          pdf: widget.chapter.notes![index])));
                             }),
                       );
                     },
@@ -240,9 +238,17 @@ class _VideoPlayerViewState extends State<VideoPlayerView>
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
+                          leading: Icon(Icons.book),
                           title: Text(widget.chapter.assignments![index].name
                               .toString()),
                           subtitle: Text('Assignment of this lecture'),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => PdfViewPage(
+                                        pdf: widget.chapter.notes![index])));
+                          },
                         ),
                       );
                     },

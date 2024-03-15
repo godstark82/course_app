@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:course_app/constants/db.dart';
 import 'package:course_app/models/course_model.dart';
+import 'package:course_app/provider/non_state_var.dart';
 import 'package:flutter/material.dart';
 
 final admin = FirebaseFirestore.instance.collection('admin');
@@ -20,20 +21,30 @@ class CourseProvider extends ChangeNotifier {
   List<Course> get courses => _courses;
 
   Future<bool> fetchCourses() async {
-    _courses.clear();
-    final query = await FirebaseFirestore.instance.collection('courses').get();
-    final docs = query.docs;
-    for (int i = 0; i < docs.length; i++) {
-      final jsonString = docs[i].data();
+    try {
+      _courses.clear();
+      final query =
+          await FirebaseFirestore.instance.collection('courses').get();
+      final docs = query.docs;
+      for (int i = 0; i < docs.length; i++) {
+        final jsonString = docs[i].data();
 
-      Course course = Course.fromJson(jsonString);
+        Course course = Course.fromJson(jsonString);
 
-      _courses.add(course);
+        _courses.add(course);
+      }
+      _courses.toSet().toList();
+      _courses.sort((a, b) => a.creationTime.compareTo(b.creationTime));
+      LocalVariables.allCourses = _courses;
+      log('local var: ${LocalVariables.allCourses.length}');
+      log('Course Fetched: ${courses.length}');
+
+      notifyListeners();
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return true;
     }
-    _courses.toSet().toList();
-    _courses.sort((a, b) => a.creationTime.compareTo(b.creationTime));
-    log('Course Fetched: ${courses.length}');
-    notifyListeners();
-    return true;
   }
 }

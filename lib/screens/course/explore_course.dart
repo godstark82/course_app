@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:course_app/constants/widgets/announcement_card.dart';
 import 'package:course_app/models/course_model.dart';
 import 'package:course_app/screens/course/components/teacher_card.dart';
 import 'package:course_app/screens/course/components/view_chapters.dart';
@@ -7,8 +8,14 @@ import 'package:get/get.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ExploreCourseScreen extends StatefulWidget {
-  const ExploreCourseScreen({super.key, required this.course});
+  const ExploreCourseScreen(
+      {super.key,
+      required this.course,
+      required this.isPurchased,
+      this.tabIndex = 0});
   final Course course;
+  final bool isPurchased;
+  final int tabIndex;
 
   @override
   State<ExploreCourseScreen> createState() => _ExploreCourseScreenState();
@@ -22,6 +29,7 @@ class _ExploreCourseScreenState extends State<ExploreCourseScreen>
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
+    tabController!.index = widget.tabIndex;
   }
 
   @override
@@ -29,12 +37,6 @@ class _ExploreCourseScreenState extends State<ExploreCourseScreen>
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 35,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          onPressed: () {
-            Get.back();
-          },
-        ),
         title: Text(widget.course.title),
         bottom: TabBar(
           isScrollable: true,
@@ -75,8 +77,9 @@ class _ExploreCourseScreenState extends State<ExploreCourseScreen>
         controller: tabController,
         children: [
           DescriptionView(course: widget.course),
-          AllClassesView(course: widget.course),
-          AnnouncementsView(course: widget.course)
+          AllClassesView(
+              course: widget.course, isPurchased: widget.isPurchased),
+          AnnouncementsView(announcements: widget.course.announcements ?? [])
         ],
       ),
     );
@@ -126,7 +129,31 @@ class DescriptionView extends StatelessWidget {
                     return TeacherCard(course: course, index: index);
                   }),
             ),
-          )
+          ),
+          const SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Divider(),
+                SizedBox(height: 20),
+                Text('FAQs',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                SizedBox(height: 10)
+              ],
+            ),
+          ),
+          SliverList.builder(
+              itemCount: course.faq.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ExpansionTile(
+                    leading: Text('Q${index + 1}'),
+                    title: Text(course.faq[index].question),
+                    children: [Text(course.faq[index].answer)],
+                  ),
+                );
+              })
         ],
       ),
     );
@@ -134,8 +161,10 @@ class DescriptionView extends StatelessWidget {
 }
 
 class AllClassesView extends StatelessWidget {
-  const AllClassesView({super.key, required this.course});
+  const AllClassesView(
+      {super.key, required this.course, required this.isPurchased});
   final Course course;
+  final bool isPurchased;
 
   @override
   Widget build(BuildContext context) {
@@ -147,17 +176,26 @@ class AllClassesView extends StatelessWidget {
           children: course.subjects
               .map((subject) => InkWell(
                     onTap: () {
-                      Get.to(() => ViewChaptersList(subject: subject));
-                      debugPrint(subject.img.toString());
+                      Get.to(() => ViewChaptersList(
+                          subject: subject, isPurchased: isPurchased));
+                      debugPrint(subject.image.url.toString());
                     },
                     child: Column(
                       children: [
-                        if (subject.img.isEmptyOrNull)
+                        if (subject.image.url.isEmptyOrNull)
                           CircleAvatar(
                             radius: 50,
                             child: CachedNetworkImage(
-                                imageUrl: subject.img ??
+                                imageUrl:
                                     'https://www.pngitem.com/pimgs/b/201-2014927_research-icon-png.png'),
+                          ),
+                        if (subject.image.url.isEmptyOrNull == false)
+                          CircleAvatar(
+                            radius: 50,
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: CachedNetworkImage(
+                                    imageUrl: subject.image.url)),
                           ),
                         Text(subject.name),
                       ],
@@ -171,19 +209,23 @@ class AllClassesView extends StatelessWidget {
 }
 
 class AnnouncementsView extends StatelessWidget {
-  const AnnouncementsView({super.key, required this.course});
-  final Course course;
+  const AnnouncementsView({super.key, required this.announcements});
+  final List<AnnounmentsModel> announcements;
 
   @override
   Widget build(BuildContext context) {
+    announcements.sort((a, b) => b.time.compareTo(a.time));
     return Scaffold(
-      body: (course.announcements ?? []).isEmpty
+      body: (announcements).isEmpty
           ? "No Announcements Yet".text.lg.bold.makeCentered()
-          : ListView.builder(
-              itemCount: course.announcements?.length,
-              itemBuilder: (context, index) {
-                return const Text('course');
-              }),
+          : Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView.builder(
+                  itemCount: announcements.length,
+                  itemBuilder: (context, index) {
+                    return AnnouncementCard(announment: announcements[index]);
+                  }),
+            ),
     );
   }
 }

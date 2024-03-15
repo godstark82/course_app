@@ -13,8 +13,8 @@ class HomeScreenCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final carousels = context.read<CarouselProvider>().carousels;
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      height: 200,
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      height: 150,
       child: FlutterCarousel.builder(
         options: CarouselOptions(
             showIndicator: true,
@@ -28,7 +28,7 @@ class HomeScreenCarousel extends StatelessWidget {
             child: InkWell(
                 onTap: () {
                   Get.to(
-                      () => ExploreCourseScreen(course: carousels[index].course));
+                      () => ExploreCourseScreen(course: carousels[index].course, isPurchased: false));
                 },
                 child: carousels.isEmpty
                     ? const SizedBox()

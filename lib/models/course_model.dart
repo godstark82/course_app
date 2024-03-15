@@ -1,11 +1,9 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// the whole course model including with PDFModels videos and assignments
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:course_app/models/category_model.dart';
 import 'package:course_app/models/gallery_model.dart';
-import 'package:course_app/provider/course_provider.dart';
+import 'package:course_app/provider/non_state_var.dart';
 
 class Course {
   int id;
@@ -22,26 +20,27 @@ class Course {
   List<AnnounmentsModel>? announcements;
 
   // constructor for course model
-  Course(
-      {required this.id,
-      required this.title,
-      required this.img,
-      required this.faq,
-      required this.category,
-      required this.subjects,
-      required this.creationTime,
-      required this.description,
-      required this.teachers,
-      required this.price,
-      required this.discount,
-      this.announcements});
+  Course({
+    required this.id,
+    required this.title,
+    required this.img,
+    required this.faq,
+    required this.category,
+    required this.subjects,
+    required this.creationTime,
+    required this.description,
+    required this.teachers,
+    required this.price,
+    required this.discount,
+    this.announcements,
+  });
   // function to Course Model this from json
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
         id: json['id'],
         title: json['title'],
         img: GalleryImage.fromJson(json['img']),
-        price: double.parse((json['price']).toString()),
+        price: double.parse(json['price'].toString()),
         faq: json['faq'] != null
             ? (json['faq'] as List)
                 .map((item) => FAQModel.fromJson(item))
@@ -56,9 +55,8 @@ class Course {
             : [],
         creationTime: DateTime.parse(json['creationTime']),
         description: json['description'],
-        teachers: (json['teachers'] as List)
-            .map((teacher) => Teacher.fromJson(teacher))
-            .toList(),
+        teachers:
+            (json['teachers'] as List).map((i) => Teacher.fromJson(i)).toList(),
         announcements: json['announcements'] != null
             ? (json['announcements'] as List)
                 .map((e) => AnnounmentsModel.fromJson(e))
@@ -84,11 +82,9 @@ class Course {
     };
   }
 
-  factory Course.fromId(int id, BuildContext context) {
-    return context
-        .read<CourseProvider>()
-        .courses
-        .firstWhere((element) => element.id == id);
+  factory Course.fromId(int id) {
+    Course course  =LocalVariables.allCourses.firstWhere((element) => element.id == id);
+    return course;
   }
 }
 
@@ -97,37 +93,33 @@ class Teacher {
   String img;
   String desc;
   String subject;
-  String? experience;
+  int experience;
+
   Teacher({
-    required this.name,
-    required this.img,
     required this.desc,
-    required this.subject,
+    required this.img,
+    required this.name,
     required this.experience,
+    required this.subject,
   });
 
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
-        name: json['name'],
-        img: json['img'],
         desc: json['desc'],
-        subject: json['subject'],
-        experience: '${json['experience'] ?? 'N/A'}');
+        img: json['img'],
+        name: json['name'],
+        experience: json['exp'],
+        subject: json['subject']);
   }
 
-  Map<String, dynamic> toJson() {
+  toJson() {
     return {
       'name': name,
       'img': img,
       'desc': desc,
+      'exp': experience,
       'subject': subject,
-      'experience': experience
     };
-  }
-
-  @override
-  String toString() {
-    return 'Teacher(name: $name, img: $img, desc: $desc, subject: $subject, experience: $experience)';
   }
 }
 
@@ -137,27 +129,26 @@ class Subject {
   //
   String name;
   List<Chapter>? chapters;
-  String? img;
+  GalleryImage image;
   Subject({
     required this.name,
     required this.chapters,
-    required this.img,
+    required this.image,
   });
 
   factory Subject.fromJson(Map<String, dynamic> json) {
     return Subject(
       name: json['name'],
-      img: json['img'],
-      chapters: json['chapters'] == null
-          ? []
-          : (json['chapters'] as List).map((i) => Chapter.fromJson(i)).toList(),
+      image: GalleryImage.fromJson(json['image']),
+      chapters:
+          (json['chapters'] as List).map((i) => Chapter.fromJson(i)).toList(),
     );
   }
 
   toJson() {
     return {
+      'image': image.toJson(),
       'name': name,
-      'img': img,
       'chapters': chapters?.map((chapter) => chapter.toJson()).toList(),
     };
   }
@@ -169,8 +160,8 @@ class Chapter {
   //
   String name;
   List<LectureVideo>? lectures;
-  List<PDF>? notes;
-  List<PDF>? assignments;
+  List<PDFModel>? notes;
+  List<PDFModel>? assignments;
 
   Chapter(
       {required this.assignments,
@@ -180,18 +171,14 @@ class Chapter {
 
   factory Chapter.fromJson(Map<String, dynamic> json) {
     return Chapter(
-      assignments: json['assignments'] == null
-          ? []
-          : (json['assignments'] as List).map((i) => PDF.fromJson(i)).toList(),
-      lectures: json['lectures'] == null
-          ? []
-          : (json['lectures'] as List)
-              .map((i) => LectureVideo.fromJson(i))
-              .toList(),
+      assignments: (json['assignments'] as List)
+          .map((i) => PDFModel.fromJson(i))
+          .toList(),
+      lectures: (json['lectures'] as List)
+          .map((i) => LectureVideo.fromJson(i))
+          .toList(),
       name: json['name'],
-      notes: json['notes'] == null
-          ? []
-          : (json['notes'] as List).map((i) => PDF.fromJson(i)).toList(),
+      notes: (json['notes'] as List).map((i) => PDFModel.fromJson(i)).toList(),
     );
   }
 
@@ -206,22 +193,23 @@ class Chapter {
   }
 }
 
-// class for a pdf
-class PDF {
-  String name;
-  String url;
+// class for a PDFModel
+class PDFModel {
+  String? name;
+  String? url;
+  DateTime time;
 
-  PDF({required this.name, required this.url});
+  PDFModel({required this.name, required this.url, required this.time});
 
-  factory PDF.fromJson(Map<String, dynamic> json) {
-    return PDF(name: json['name'], url: json['url']);
+  factory PDFModel.fromJson(Map<String, dynamic> json) {
+    return PDFModel(
+        name: json['name'],
+        url: json['url'],
+        time: DateTime.parse(json['time']));
   }
 
   toJson() {
-    return {
-      'name': name,
-      'url': url,
-    };
+    return {'name': name, 'url': url, 'time': time.toIso8601String()};
   }
 }
 
@@ -229,16 +217,29 @@ class LectureVideo {
   String name;
   String url;
   String thumbnail;
-  LectureVideo(
-      {required this.name, required this.url, required this.thumbnail});
+  DateTime time;
+  LectureVideo({
+    required this.name,
+    required this.url,
+    required this.thumbnail,
+    required this.time,
+  });
 
   factory LectureVideo.fromJson(Map<String, dynamic> json) {
     return LectureVideo(
-        name: json['name'], url: json['url'], thumbnail: json['thumbnail']);
+        name: json['name'],
+        url: json['url'],
+        thumbnail: json['thumbnail'],
+        time: DateTime.parse(json['time']));
   }
 
   toJson() {
-    return {'name': name, 'url': url, 'thumbnail': thumbnail};
+    return {
+      'name': name,
+      'url': url,
+      'thumbnail': thumbnail,
+      'time': time.toIso8601String()
+    };
   }
 }
 
@@ -267,16 +268,21 @@ class AnnounmentsModel {
   String adminName;
   String text;
   String? image;
+  DateTime time;
 
   AnnounmentsModel({
     required this.adminName,
     required this.text,
+    required this.time,
     this.image,
   });
 
   factory AnnounmentsModel.fromJson(Map<String, dynamic> json) {
     return AnnounmentsModel(
-        adminName: json['adminName'], text: json['text'], image: json['image']);
+        adminName: json['adminName'],
+        text: json['text'],
+        image: json['image'],
+        time: DateTime.parse(json['time']));
   }
 
   Map<String, dynamic> toJson() {
@@ -284,6 +290,7 @@ class AnnounmentsModel {
       'adminName': adminName,
       'text': text,
       'image': image ?? 'N/A',
+      'time': time.toIso8601String(),
     };
   }
 }

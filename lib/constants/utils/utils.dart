@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -32,4 +34,15 @@ Future loadingDialog(BuildContext context) async {
       ),
     ),
   );
+}
+
+class LottieFiles {
+  static const String GRADIENT = 'assets/anim/gradient.json';
+  static const String COURSE = 'assets/anim/course.json';
+  static const String QUIZ = 'assets/anim/quiz.json';
+  static const String RESULT = 'assets/anim/result.json';
+}
+
+class GlobalKeys {
+  static GlobalKey<ScaffoldState> homeScaffoldKey = GlobalKey<ScaffoldState>();
 }

@@ -18,16 +18,21 @@ class CategoryProvider extends ChangeNotifier {
   List<Category> get categories => _categories;
 
   Future<List<Category>> fetchCategories() async {
-    _categories.clear();
-    final query = await admin.doc('db').collection('category').get();
-    List<QueryDocumentSnapshot> docs = query.docs;
-    for (int i = 0; i < docs.length; i++) {
-      final jsonString = docs[i].data() as Map<String, dynamic>;
-      final category = Category.fromJson(jsonString);
-      _categories.add(category);
+    try {
+      _categories.clear();
+      final query = await admin.doc('db').collection('category').get();
+      List<QueryDocumentSnapshot> docs = query.docs;
+      for (int i = 0; i < docs.length; i++) {
+        final jsonString = docs[i].data() as Map<String, dynamic>;
+        final category = Category.fromJson(jsonString);
+        _categories.add(category);
+      }
+      log('Category Fetched ${categories.length}');
+      notifyListeners();
+      return _categories;
+    } catch (e) {
+      log(e.toString());
+      return [];
     }
-    log('Category Fetched ${categories.length}');
-    notifyListeners();
-    return _categories;
   }
 }

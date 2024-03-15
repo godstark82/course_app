@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ViewChaptersList extends StatelessWidget {
-  const ViewChaptersList({super.key, required this.subject});
+  const ViewChaptersList(
+      {super.key, required this.subject, required this.isPurchased});
   final Subject subject;
+  final bool isPurchased;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +20,9 @@ class ViewChaptersList extends StatelessWidget {
           itemBuilder: (context, index) => Card(
                 child: ListTile(
                   onTap: () {
-                    Get.to(
-                        () => ChapterView(chapter: subject.chapters![index]));
+                    Get.to(() => ChapterView(
+                        chapter: subject.chapters![index],
+                        purchased: isPurchased));
                   },
                   leading: Text('${index + 1}'),
                   title: Text(subject.chapters![index].name),

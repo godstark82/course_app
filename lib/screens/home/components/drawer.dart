@@ -1,3 +1,6 @@
+import 'package:course_app/constants/utils/utils.dart';
+import 'package:course_app/screens/home/home.dart';
+import 'package:course_app/screens/study/study_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,13 +20,13 @@ class MyDrawer extends StatelessWidget {
 
     return Drawer(
       shape: const BeveledRectangleBorder(),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
               children: [
                 const CircleAvatar(child: FlutterLogo()),
                 const SizedBox(width: 15),
@@ -51,11 +54,50 @@ class MyDrawer extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            const Divider(),
-            
-          ],
-        ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(thickness: 3),
+          ListTile(
+            style: ListTileStyle.drawer,
+            onTap: () {
+              if (GlobalKeys.homeScaffoldKey.currentState?.isDrawerOpen ==
+                  true) {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+              }
+              Get.to(() => const StudyScreen());
+            },
+            title: const Text(
+              'Study Section',
+              style: TextStyle(fontSize: 16),
+            ),
+            leading: const Icon(Icons.book),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Category'),
+            onTap: () {
+              selectedIndex.value = 1;
+              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Quizes'),
+            onTap: () {
+              selectedIndex.value = 2;
+              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Profile'),
+            onTap: () {
+              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+              Get.toNamed('/profile');
+            },
+          ),
+          const Divider(),
+        ],
       ),
     );
   }
