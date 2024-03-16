@@ -4,17 +4,20 @@ import 'package:velocity_x/velocity_x.dart';
 
 class FilterView extends StatelessWidget {
   const FilterView(
-      {super.key, required this.decreasingFn, required this.increasingFn});
+      {super.key,
+      required this.decreasingFn,
+      required this.increasingFn,
+      required this.showHeader});
 
   final VoidCallback increasingFn;
   final VoidCallback decreasingFn;
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
+        if(showHeader) Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

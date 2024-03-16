@@ -43,6 +43,18 @@ class LottieFiles {
   static const String RESULT = 'assets/anim/result.json';
 }
 
+class AssetImages {
+  static const String ABOUT = 'assets/images/about.png';
+  static const String CATEGORY = 'assets/images/category.png';
+  static const String COURSE = 'assets/images/course.png';
+  static const String QUIZ_1 = 'assets/images/quiz_1.png';
+  static const String QUIZ_2 = 'assets/images/quiz_2.png';
+  static const String STUDY = 'assets/images/study.png';
+  static const String NOTEPEDIAX_BLACK = 'assets/images/notepediax_black.png';
+  static const String NOTEPEDIAX_WHITE = 'assets/images/notepediax_white.png';
+
+}
+
 class GlobalKeys {
   static GlobalKey<ScaffoldState> homeScaffoldKey = GlobalKey<ScaffoldState>();
 }

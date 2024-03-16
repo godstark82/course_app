@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -34,6 +35,12 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('cache');
   await InitClass.init();
+  //Remove this method to stop OneSignal Debugging
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize("abfbf5a7-d8c8-4dfc-b176-76eb5ff8bf0d");
+// The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+  OneSignal.Notifications.requestPermission(true);
+  
   runApp(const MyApp());
 }
 

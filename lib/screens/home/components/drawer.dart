@@ -1,6 +1,9 @@
 import 'package:course_app/constants/utils/utils.dart';
+import 'package:course_app/screens/category/category_screen.dart';
 import 'package:course_app/screens/home/home.dart';
 import 'package:course_app/screens/study/study_screen.dart';
+import 'package:course_app/screens/views/about_us.dart';
+import 'package:course_app/screens/views/contact_us.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,47 +60,81 @@ class MyDrawer extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           const Divider(thickness: 3),
-          ListTile(
-            style: ListTileStyle.drawer,
-            onTap: () {
-              if (GlobalKeys.homeScaffoldKey.currentState?.isDrawerOpen ==
-                  true) {
+          DrawerTile(
+              iconData: AssetImage(AssetImages.STUDY),
+              onTap: () {
                 GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
-              }
-              Get.to(() => const StudyScreen());
-            },
-            title: const Text(
-              'Study Section',
+                Get.to(() => StudyScreen());
+              },
+              title: 'Study Section'),
+          DrawerTile(
+              iconData: AssetImage(AssetImages.COURSE),
+              onTap: () {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+                selectedIndex.value = 0;
+              },
+              title: 'All Courses'),
+          DrawerTile(
+              iconData: AssetImage(AssetImages.CATEGORY),
+              onTap: () {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+                Get.to(() => CategoryScreen());
+              },
+              title: 'Categories'),
+          DrawerTile(
+              iconData: AssetImage(AssetImages.QUIZ_1),
+              onTap: () {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+                selectedIndex.value = 3;
+              },
+              title: 'Quizes'),
+          DrawerTile(
+              iconData: AssetImage(AssetImages.ABOUT),
+              onTap: () {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+                Get.to(() => AboutusScreen());
+              },
+              title: 'About Notepediax'),
+          DrawerTile(
+              iconData: AssetImage(AssetImages.ABOUT),
+              onTap: () {
+                GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
+                Get.to(() => ContactusScreen());
+              },
+              title: 'Contact us'),
+        ],
+      ),
+    );
+  }
+}
+
+class DrawerTile extends StatelessWidget {
+  const DrawerTile(
+      {super.key,
+      required this.iconData,
+      required this.onTap,
+      required this.title});
+  final ImageProvider iconData;
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          children: [
+            SizedBox(width: 2),
+            Image(image: iconData, height: 24, width: 24),
+            SizedBox(width: 10),
+            Text(
+              title,
               style: TextStyle(fontSize: 16),
             ),
-            leading: const Icon(Icons.book),
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Category'),
-            onTap: () {
-              selectedIndex.value = 1;
-              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Quizes'),
-            onTap: () {
-              selectedIndex.value = 2;
-              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Profile'),
-            onTap: () {
-              GlobalKeys.homeScaffoldKey.currentState?.closeDrawer();
-              Get.toNamed('/profile');
-            },
-          ),
-          const Divider(),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -12,6 +12,7 @@ import 'package:course_app/screens/study/study_screen.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -35,12 +36,12 @@ class _HomeState extends State<Home> {
                   return const Text('Notepediax').text.bold.make();
                 }
                 if (value == 1) {
-                  return const Text('Category').text.bold.make();
+                  return const Text('Notes').text.bold.make();
                 }
-                if (value == 2) {
+                if (value == 3) {
                   return const Text('Quizes').text.bold.make();
                 } else {
-                  return const Text('Profile').text.bold.make();
+                  return const Text('Store').text.bold.make();
                 }
               }),
           elevation: 2,
@@ -109,26 +110,34 @@ class _HomeState extends State<Home> {
 
   List<TabItem> items = [
     const TabItem(
-      icon: Icons.home,
-      title: 'Batches',
+      icon: Ionicons.home_outline,
+      title: 'Home',
     ),
     const TabItem(
-      icon: Icons.my_library_books,
-      title: 'Category',
+      icon: Ionicons.tablet_landscape_outline,
+      title: 'Notes',
     ),
     const TabItem(
-      icon: Icons.library_books_outlined,
+      icon: Ionicons.book_outline,
       title: 'Study',
     ),
     const TabItem(
-      icon: Icons.quiz,
+      icon: Ionicons.bulb_outline,
       title: 'Quiz',
     ),
     const TabItem(
-      icon: Icons.person,
-      title: 'Profile',
+      icon: Ionicons.storefront_outline,
+      title: 'Store',
     ),
   ];
+}
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
 
 ValueNotifier<int> selectedIndex = ValueNotifier(0);

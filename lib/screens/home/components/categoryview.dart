@@ -30,13 +30,13 @@ class CategoryViewHomeScreen extends StatelessWidget {
           ),
         ),
         SizedBox(
-            height: 150,
+            height: 120,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: context.read<CategoryProvider>().categories.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: InkWell(
                           onTap: () {
                             Get.to(() => CategoryCourses(
