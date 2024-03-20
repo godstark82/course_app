@@ -4,12 +4,14 @@ import 'package:course_app/constants/widgets/skeleton_widget.dart';
 import 'package:course_app/provider/carousel_provider.dart';
 import 'package:course_app/provider/category_provider.dart';
 import 'package:course_app/provider/quiz_provider.dart';
+import 'package:course_app/provider/store_provider.dart';
 import 'package:course_app/provider/user_provider.dart';
 import 'package:course_app/screens/home/components/drawer.dart';
 import 'package:course_app/screens/home/home_screen.dart';
+import 'package:course_app/screens/notes/notes_screen.dart';
 import 'package:course_app/screens/quiz/quiz_screen.dart';
+import 'package:course_app/screens/store/store_screen.dart';
 import 'package:course_app/screens/study/study_screen.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
@@ -24,6 +26,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,11 +58,12 @@ class _HomeState extends State<Home> {
             future: Future.wait([
               // Courses has been fetched in fetchUserCourses function
               context.read<UserProvider>().fetchUserCourses(context),
-              // context.read<CourseProvider>().fetchCourses(),
+              context.read<UserProvider>().fetchUserNotes(context),
+              context.read<UserProvider>().fetchUserQuizes(context),
               context.read<CarouselProvider>().fetchCarousel(),
               context.read<CategoryProvider>().fetchCategories(),
               context.read<QuizProvider>().fetchQuizes(),
-              context.read<QuizProvider>().fetchUserQuiz()
+              context.read<StoreProvider>().fetchStore(),
             ]),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -102,10 +110,10 @@ class _HomeState extends State<Home> {
 
   List<Widget> screen = <Widget>[
     const HomeScreen(),
-    const QuizScreen(isUserQuizes: false),
+    const NotesScreen(),
     const StudyScreen(),
-    const QuizScreen(isUserQuizes: false),
-    const ProfileScreen()
+    const QuizScreen(isUserQuiz: false),
+    const StoreScreen()
   ];
 
   List<TabItem> items = [
@@ -131,6 +139,7 @@ class _HomeState extends State<Home> {
     ),
   ];
 }
+
 class MyWidget extends StatelessWidget {
   const MyWidget({super.key});
 

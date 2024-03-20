@@ -4,7 +4,9 @@ import 'package:course_app/provider/bottom_bar_provider.dart';
 import 'package:course_app/provider/carousel_provider.dart';
 import 'package:course_app/provider/category_provider.dart';
 import 'package:course_app/provider/course_provider.dart';
+import 'package:course_app/provider/notes_provider.dart';
 import 'package:course_app/provider/quiz_provider.dart';
+import 'package:course_app/provider/store_provider.dart';
 import 'package:course_app/provider/user_provider.dart';
 import 'package:course_app/screens/home/components/onboarding.dart';
 import 'package:course_app/screens/login/login.dart';
@@ -36,11 +38,12 @@ void main() async {
   await Hive.openBox('cache');
   await InitClass.init();
   //Remove this method to stop OneSignal Debugging
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.Debug.setLogLevel(OSLogLevel.error);
   OneSignal.initialize("abfbf5a7-d8c8-4dfc-b176-76eb5ff8bf0d");
 // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
   OneSignal.Notifications.requestPermission(true);
-  
+  //
+
   runApp(const MyApp());
 }
 
@@ -60,7 +63,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<BottomBarProvider>(
             create: (_) => BottomBarProvider()),
         ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
-        ChangeNotifierProvider<QuizProvider>(create: (_) => QuizProvider())
+        ChangeNotifierProvider<QuizProvider>(create: (_) => QuizProvider()),
+        ChangeNotifierProvider<NotesProvider>(create: (_) => NotesProvider()),
+        ChangeNotifierProvider<StoreProvider>(create: (_) => StoreProvider())
       ],
       child: GetMaterialApp(
           navigatorKey: navigatorKey,
@@ -83,7 +88,7 @@ final routes = {
   '/sign-in': (context) => const LoginScreen(),
   '/profile': (context) => ProfileScreen(
         showDeleteConfirmationDialog: true,
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(title: const Text('Profile'), elevation: 1),
         showUnlinkConfirmationDialog: true,
         actions: [
           SignedOutAction((context) {
@@ -92,6 +97,12 @@ final routes = {
           AccountDeletedAction((context, user) async {
             Get.offAllNamed('/sign-in');
           })
+        ],
+        children: [
+          Text(
+            'User uid: ${FirebaseAuth.instance.currentUser?.uid}',
+            style: TextStyle(color: Colors.grey, fontSize: 15),
+          )
         ],
       ),
   '/home': (context) => const Home(),

@@ -1,13 +1,18 @@
 import 'package:course_app/models/quiz_model.dart';
-import 'package:course_app/provider/quiz_provider.dart';
+import 'package:course_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class EnrollQuizScreen extends StatelessWidget {
+class EnrollQuizScreen extends StatefulWidget {
   const EnrollQuizScreen({super.key, required this.quiz});
   final QuizModel quiz;
 
+  @override
+  State<EnrollQuizScreen> createState() => _EnrollQuizScreenState();
+}
+
+class _EnrollQuizScreenState extends State<EnrollQuizScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,8 +30,8 @@ class EnrollQuizScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
-          title:
-              Text(quiz.quizName, style: const TextStyle(color: Colors.white)),
+          title: Text(widget.quiz.title,
+              style: const TextStyle(color: Colors.white)),
         ),
         backgroundColor: Colors.transparent,
         body: SizedBox(
@@ -43,19 +48,18 @@ class EnrollQuizScreen extends StatelessWidget {
               const SizedBox(height: 25),
               FilledButton(
                   onPressed: () async {
-                    await context
-                        .read<QuizProvider>()
-                        .enrollQuiz(UserQuizModel(
-                            userRecords: [],
-                            attemped: false,
-                            lastScore: 0,
-                            quiz: quiz,
-                            time: DateTime.now()))
-                        .whenComplete(() {
-                      Get.back();
-                    });
+                    final QuizModel newQuiz = widget.quiz.copyWith(
+                        isPurchased: true,
+                        isAttempted: false,
+                        lastScore: 0,
+                        lastResponse: []);
+                    context
+                        .read<UserProvider>()
+                        .buyQuizes(newQuiz)
+                        .whenComplete(() => Get.back());
+                    setState(() {});
                   },
-                  child: const Text('Entroll Quiz'))
+                  child: const Text('Enroll Quiz'))
             ],
           ),
         ),

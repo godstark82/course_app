@@ -9,7 +9,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class QuizResultScreen extends StatelessWidget {
   const QuizResultScreen({super.key, required this.userQuiz});
-  final UserQuizModel userQuiz;
+  final QuizModel userQuiz;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class QuizResultScreen extends StatelessWidget {
                   Text('${userQuiz.lastScore} ',
                       style:
                           TextStyle(fontSize: 32, color: Colors.teal.shade200)),
-                  Text('/ ${userQuiz.quiz.questions.length}',
+                  Text('/ ${userQuiz.questions.length}',
                       style: const TextStyle(fontSize: 32, color: Colors.white))
                 ],
               ),
@@ -107,21 +107,21 @@ class QuizResultScreen extends StatelessWidget {
                           height: 500,
                           child: ListView(
                             shrinkWrap: true,
-                            children: userQuiz.quiz.questions.map((question) {
+                            children: userQuiz.questions.map((question) {
                               final index =
-                                  userQuiz.quiz.questions.indexOf(question);
+                                  userQuiz.questions.indexOf(question);
                               return CupertinoListTile(
                                 trailing: question.correctAnswer ==
-                                        userQuiz.userRecords[index]
+                                        userQuiz.lastResponse![index]!
                                     ? const Text('+1').text.green900.make()
                                     : const Text('-1').text.red500.make(),
                                 subtitle: Text(
                                     'Correct Answer: ${question.options[question.correctAnswer - 1]}'),
                                 additionalInfo: Text(
-                                    'You marked: ${question.options[userQuiz.userRecords[index]! - 1]}'),
+                                    'You marked: ${question.options[userQuiz.lastResponse![index]! - 1]}'),
                                 title: Text(question.question),
                                 leading: question.correctAnswer ==
-                                        userQuiz.userRecords[index]
+                                        userQuiz.lastResponse![index]
                                     ? const Icon(Icons.check,
                                         color: Colors.green)
                                     : const Icon(Icons.close,

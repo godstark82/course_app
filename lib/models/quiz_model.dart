@@ -1,85 +1,105 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-class UserQuizModel {
-  QuizModel quiz;
-  bool attemped;
-  int lastScore;
-  DateTime time;
-  List<int?> userRecords;
-
-  UserQuizModel(
-      {required this.attemped,
-      required this.lastScore,
-      required this.quiz,
-      required this.time,
-      required this.userRecords});
-
-  factory UserQuizModel.fromJson(Map<String, dynamic> json) {
-    return UserQuizModel(
-        time: DateTime.parse(json['time'].toString()),
-        attemped: bool.parse(json['attemped'].toString()),
-        lastScore: int.parse(json['lastScore'].toString()),
-        userRecords: (json['userRecords'] as List)
-            .map((e) => int.parse(e.toString()))
-            .toList(),
-        quiz: QuizModel.fromJson(json['quiz']));
-  }
-
-  toJson() {
-    return {
-      'time': time.toIso8601String(),
-      'attemped': attemped,
-      'lastScore': lastScore,
-      'userRecords': userRecords.map((e) => int.parse(e.toString())).toList(),
-      'quiz': quiz.toJson()
-    };
-  }
-}
-
 class QuizModel {
-  String quizName;
+  String title;
+  String description;
+  String? image;
+  double price;
   DateTime time;
   List<QuizQuestion> questions;
-  QuizModel({
-    required this.quizName,
-    required this.time,
-    required this.questions,
-  });
+  bool isPurchased;
+  bool? isAttempted;
+  int? lastScore;
+  List<int?>? lastResponse;
+  QuizModel(
+      {required this.title,
+      required this.description,
+      required this.image,
+      required this.price,
+      required this.time,
+      required this.isPurchased,
+      required this.questions,
+      this.isAttempted,
+      this.lastResponse,
+      this.lastScore});
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'quizName': quizName,
+      'isPurchased': isPurchased,
+      'description': description,
+      'image': image,
+      'price': price,
+      'title': title,
       'time': time.toIso8601String(),
       'questions': questions.map((x) => x.toJson()).toList(),
+      'isAttempted': isAttempted,
+      'lastReponse': lastResponse,
+      'lastScore': lastScore
     };
   }
 
   factory QuizModel.fromJson(Map<String, dynamic> map) {
     return QuizModel(
-        quizName: map['quizName'].toString(),
+        description: map['description'],
+        image: map['image'],
+        price: double.parse(map['price'].toString()),
+        isAttempted: map['isAttempted'],
+        lastResponse: map['lastResponse'],
+        lastScore: map['lastScore'],
+        isPurchased: false,
+        title: map['title'].toString(),
         time: DateTime.parse(map['time']),
         questions: (map['questions'] as List)
             .map((question) => QuizQuestion.fromJson(question))
             .toList());
   }
+  // Create a new QuizModel instance with updated properties
+  QuizModel copyWith({
+    String? title,
+    String? description,
+    String? image,
+    double? price,
+    DateTime? time,
+    List<QuizQuestion>? questions,
+    bool? isPurchased,
+    bool? isAttempted,
+    int? lastScore,
+    List<int?>? lastResponse,
+  }) {
+    return QuizModel(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      image: image ?? this.image,
+      price: price ?? this.price,
+      time: time ?? this.time,
+      questions: questions ?? this.questions,
+      isPurchased: isPurchased ?? this.isPurchased,
+      isAttempted: isAttempted ?? this.isAttempted,
+      lastScore: lastScore ?? this.lastScore,
+      lastResponse: lastResponse ?? this.lastResponse,
+    );
+  }
 
   @override
   String toString() =>
-      'QuizModel(quizName: $quizName, time: $time, questions: $questions)';
+      'QuizModel(quizName: $title, time: $time, questions: $questions)';
 }
 
 class QuizQuestion {
   String question;
+  String image;
   List<String> options;
   int correctAnswer;
   QuizQuestion({
     required this.question,
     required this.options,
+    required this.image,
     required this.correctAnswer,
   });
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      'image': image,
       'question': question,
       'options': options,
       'correctAnswer': correctAnswer,
@@ -88,6 +108,7 @@ class QuizQuestion {
 
   factory QuizQuestion.fromJson(Map<String, dynamic> map) {
     return QuizQuestion(
+      image: map['image'] ?? '',
       correctAnswer: int.parse(map['correctAnswer'].toString()),
       question: map['question'].toString(),
       options: (map['options'] as List).map((e) => '$e').toList(),

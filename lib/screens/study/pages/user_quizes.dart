@@ -40,7 +40,7 @@ class _UserQuizesState extends State<UserQuizes> {
                         child: const Center(
                             child: Icon(
                           Icons.arrow_back_ios_new,
-                          color: Colors.blue,
+                          color: Colors.deepPurple,
                           size: 18,
                         )),
                       ))),
@@ -59,7 +59,7 @@ class _UserQuizesState extends State<UserQuizes> {
           ),
         ),
       ),
-      body: const QuizScreen(isUserQuizes: true),
+      body: const QuizScreen(isUserQuiz: true),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:course_app/constants/utils/utils.dart';
 import 'package:course_app/screens/study/pages/user_courses.dart';
+import 'package:course_app/screens/study/pages/user_notes.dart';
 import 'package:course_app/screens/study/pages/user_quizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,7 @@ class StudyScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Lottie.asset(LottieFiles.COURSE, height: 120),
+                        Lottie.asset(LottieFiles.COURSE, height: 100),
                         const Text(
                           'Your Courses',
                           style: TextStyle(
@@ -50,7 +51,7 @@ class StudyScreen extends StatelessWidget {
                         ),
                         const Icon(
                           Icons.arrow_circle_right_outlined,
-                          size: 24,
+                          size: 20,
                         )
                       ],
                     )),
@@ -72,7 +73,7 @@ class StudyScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Lottie.asset(LottieFiles.QUIZ, height: 120),
+                        Lottie.asset(LottieFiles.QUIZ, height: 100),
                         const Text(
                           'Your Quizes',
                           style: TextStyle(
@@ -80,7 +81,37 @@ class StudyScreen extends StatelessWidget {
                         ),
                         const Icon(
                           Icons.arrow_circle_right_outlined,
-                          size: 24,
+                          size: 20,
+                        )
+                      ],
+                    )),
+              ),
+              InkWell(
+                onTap: () {
+                  Get.to(() => const UserNotes());
+                },
+                child: Container(
+                    height: 150,
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.blueAccent),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Lottie.asset(LottieFiles.QUIZ, height: 100),
+                        const Text(
+                          'Your Notes',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const Icon(
+                          Icons.arrow_circle_right_outlined,
+                          size: 20,
                         )
                       ],
                     )),

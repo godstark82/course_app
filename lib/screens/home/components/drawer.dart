@@ -22,6 +22,7 @@ class MyDrawer extends StatelessWidget {
     }
 
     return Drawer(
+      backgroundColor: Colors.white,
       shape: const BeveledRectangleBorder(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,16 +124,13 @@ class DrawerTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Row(
           children: [
             SizedBox(width: 2),
             Image(image: iconData, height: 24, width: 24),
             SizedBox(width: 10),
-            Text(
-              title,
-              style: TextStyle(fontSize: 16),
-            ),
+            Text(title, style: TextStyle(fontSize: 15)),
           ],
         ),
       ),

@@ -33,7 +33,7 @@ class _PdfViewPageState extends State<PdfViewPage> {
     return Scaffold(
         appBar: AppBar(
           elevation: 2,
-          title: const Text('Viewing PDF'),
+          title: Text(widget.pdf.name.toString()),
         ),
         body: const PDF().cachedFromUrl(
           widget.pdf.url.toString(),

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:course_app/main.dart';
 import 'package:course_app/models/quiz_model.dart';
-import 'package:course_app/provider/quiz_provider.dart';
+import 'package:course_app/provider/user_provider.dart';
 import 'package:course_app/screens/quiz/components/result_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +17,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class PlayQuizScreen extends StatefulWidget {
   const PlayQuizScreen({super.key, required this.userQuiz});
-  final UserQuizModel userQuiz;
+  final QuizModel userQuiz;
   @override
   State<PlayQuizScreen> createState() => _PlayQuizScreenState();
 }
@@ -27,14 +27,15 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   late TabController tabController;
   late List<int?> selectedOptions = [];
   bool loading = false;
+  int? selectedOption;
   GlobalKey<NavigatorState> dialogeNavigator = GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();
-    tabController = TabController(
-        length: widget.userQuiz.quiz.questions.length, vsync: this);
+    tabController =
+        TabController(length: widget.userQuiz.questions.length, vsync: this);
     selectedOptions =
-        List.generate(widget.userQuiz.quiz.questions.length, (index) => null);
+        List.generate(widget.userQuiz.questions.length, (index) => -1);
     if (kDebugMode) {
       print(selectedOptions);
     }
@@ -43,8 +44,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   int calScore() {
     int currentScore = 0;
     for (int i = 0; i < selectedOptions.length; i++) {
-      if (selectedOptions[i] ==
-          widget.userQuiz.quiz.questions[i].correctAnswer) {
+      if (selectedOptions[i] == widget.userQuiz.questions[i].correctAnswer) {
         currentScore++;
       }
     }
@@ -95,6 +95,50 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
         child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FilledButton(
+                      onPressed: () async {
+                        if (selectedOptions.contains(null) == false) {
+                          loading = true;
+                          setState(() {});
+                          //
+                          // code to update the data on firestore'
+                          int score = calScore();
+
+                          final newQuiz = widget.userQuiz.copyWith(
+                            lastScore: score,
+                            isAttempted: true,
+                            isPurchased: true,
+                            lastResponse: selectedOptions,
+                          );
+
+                          await context
+                              .read<UserProvider>()
+                              .updateQuiz(newQuiz);
+                          loading = false;
+                          setState(() {});
+                          // navigate to other screen
+                          Get.off(() => QuizResultScreen(userQuiz: newQuiz));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Please Select atleast one option')));
+                        }
+                      },
+                      child: loading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('SUBMIT')),
+                ),
+              ],
               elevation: 0,
               leading: IconButton(
                   onPressed: () {
@@ -102,15 +146,16 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                   },
                   icon: const Icon(Icons.arrow_back, color: Colors.white)),
               backgroundColor: Colors.transparent,
-              title: Text(widget.userQuiz.quiz.quizName).text.white.make(),
+              title: Text(widget.userQuiz.title).text.white.make(),
             ),
             body: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
               controller: tabController,
-              children: widget.userQuiz.quiz.questions.map((question) {
-                final index = widget.userQuiz.quiz.questions.indexOf(question);
+              children: widget.userQuiz.questions.map((question) {
+                final index = widget.userQuiz.questions.indexOf(question);
                 RadioGroupController radioGroupController =
                     RadioGroupController();
-                int? selectedOption;
+
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -127,6 +172,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                         const SizedBox(height: 35),
                         RadioGroup(
                             values: question.options,
+                            indexOfDefault: selectedOptions[index]! - 1,
                             labelBuilder: (label) {
                               return Card(
                                 margin: const EdgeInsets.all(10),
@@ -161,63 +207,23 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                     onPressed: () {
                                       tabController
                                           .animateTo(tabController.index - 1);
+                                      setState(() {});
                                     },
                                     child: const Text('Back')),
-                            tabController.index + 1 !=
-                                    widget.userQuiz.quiz.questions.length
-                                ? Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: FilledButton(
-                                        onPressed: () {
-                                          if (selectedOptions[index] != null) {
-                                            tabController.animateTo(
-                                                tabController.index + 1);
-                                          }
-                                        },
-                                        child: const Text('Next')),
-                                  )
-                                : FilledButton(
-                                    onPressed: () async {
-                                      if (selectedOptions.contains(null) ==
-                                          false) {
-                                        loading = true;
+                            if (tabController.index + 1 !=
+                                widget.userQuiz.questions.length)
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: FilledButton(
+                                    onPressed: () {
+                                      if (selectedOptions[index] != null) {
+                                        tabController
+                                            .animateTo(tabController.index + 1);
                                         setState(() {});
-                                        //
-                                        // code to update the data on firestore'
-                                        int score = calScore();
-                                        UserQuizModel newUserQuizModel =
-                                            UserQuizModel(
-                                                attemped: true,
-                                                lastScore: score,
-                                                quiz: widget.userQuiz.quiz,
-                                                userRecords: selectedOptions,
-                                                time: DateTime.now());
-                    
-                                        await context
-                                            .read<QuizProvider>()
-                                            .editQuizToUserDoc(
-                                                newUserQuizModel);
-                                        loading = false;
-                                        setState(() {});
-                                        // navigate to other screen
-                                        Get.off(() => QuizResultScreen(
-                                            userQuiz: newUserQuizModel));
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                content: Text(
-                                                    'Please Select atleast one option')));
                                       }
                                     },
-                                    child: loading
-                                        ? const SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const Text('SUBMIT')),
+                                    child: const Text('Next')),
+                              )
                           ],
                         )
                       ],

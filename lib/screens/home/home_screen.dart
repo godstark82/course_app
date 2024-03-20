@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SliverToBoxAdapter(child: HomeScreenCarousel()),
         const SliverToBoxAdapter(child: CategoryViewHomeScreen()),
         SliverToBoxAdapter(
-            child: FilterView(
+            child: FilterViewHome(
               showHeader: true,
                 decreasingFn: sortCoursesByDecreasedTime,
                 increasingFn: sortCoursesByIncreasedTime)),

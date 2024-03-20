@@ -2,8 +2,12 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:course_app/models/course_model.dart';
+import 'package:course_app/models/notes_model.dart';
+import 'package:course_app/provider/notes_provider.dart';
 import 'package:course_app/provider/user_provider.dart';
 import 'package:course_app/screens/course/explore_course.dart';
+import 'package:course_app/screens/notes/components/confirm_purchase_notes.dart';
+import 'package:course_app/screens/notes/components/explore_notes.dart';
 import 'package:course_app/screens/views/confirm_purchase.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,17 +15,16 @@ import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class CourseTile extends StatefulWidget {
-  const CourseTile(
-      {super.key, required this.course, required this.isPurchased});
-  final Course course;
+class NotesTile extends StatefulWidget {
+  const NotesTile({super.key, required this.notes, required this.isPurchased});
+  final NotesModel notes;
   final bool isPurchased;
 
   @override
-  State<CourseTile> createState() => _CourseTileState();
+  State<NotesTile> createState() => _CourseTileState();
 }
 
-class _CourseTileState extends State<CourseTile> {
+class _CourseTileState extends State<NotesTile> {
   @override
   void initState() {
     super.initState();
@@ -29,9 +32,7 @@ class _CourseTileState extends State<CourseTile> {
 
   @override
   Widget build(BuildContext context) {
-    final price = widget.course.price;
-    final oldPrice = widget.course.price +
-        ((widget.course.price * widget.course.discount) / 100);
+    final price = widget.notes.price;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -44,57 +45,45 @@ class _CourseTileState extends State<CourseTile> {
                 offset: Offset(1, 0),
                 blurRadius: 2,
                 color: Colors.grey,
-                blurStyle: BlurStyle.inner),
-            BoxShadow(
-                offset: Offset(-1, 0),
-                blurRadius: 2,
-                color: Colors.grey,
-                blurStyle: BlurStyle.inner),
-            // BoxShadow(offset: Offset.zero, blurRadius: 4,color: Colors.grey),
+                blurStyle: BlurStyle.solid),
           ]),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.course.title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 5),
-          AspectRatio(
-              aspectRatio: 16 / 9,
-              child: CachedNetworkImage(
-                  imageUrl: widget.course.img.url, width: context.width)),
-          Divider(),
-          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '$oldPrice',
-                    style: TextStyle(decoration: TextDecoration.lineThrough),
-                  ),
-                  SizedBox(width: 10),
-                  Text('Rs. $price /-',
+                  Text(widget.notes.title,
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text(widget.notes.category.name.toString())
                 ],
               ),
-              Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(10)),
-                  child:
-                      Text('Discount of ${widget.course.discount}% Applied')),
+              SizedBox(width: 5),
+              SizedBox(
+                height: 75,
+                child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: CachedNetworkImage(
+                        imageUrl: widget.notes.image.url, height: 100)),
+              ),
             ],
           ),
-          SizedBox(height: 20),
-          context.read<UserProvider>().userCourses.contains(widget.course)
+          SizedBox(
+            child: Text('Rs. $price /-',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
+          ),
+          SizedBox(height: 10),
+          context.watch<UserProvider>().userNotes.contains(widget.notes)
               ? FilledButton(
                   onPressed: () {
-                    Get.to(() => ExploreCourseScreen(
-                        tabIndex: 1, course: widget.course, isPurchased: true));
+                    Get.to(() => ExploreNotesScreen(
+                        isPurchased: true, notes: widget.notes));
                   },
                   child: SizedBox(
                       width: context.width,
@@ -105,8 +94,8 @@ class _CourseTileState extends State<CourseTile> {
                   children: [
                     InkWell(
                       onTap: () {
-                        Get.to(() => ExploreCourseScreen(
-                            course: widget.course,
+                        Get.to(() => ExploreNotesScreen(
+                            notes: widget.notes,
                             isPurchased: widget.isPurchased));
                       },
                       child: Container(
@@ -120,22 +109,21 @@ class _CourseTileState extends State<CourseTile> {
                                   style: TextStyle(color: Colors.deepPurple)))),
                     ),
                     InkWell(
-                      onTap: () {
-                        int? id;
-                        List<Course> userCourse =
-                            context.read<UserProvider>().userCourses;
-                        for (int i = 0; i < userCourse.length; i++) {
-                          if (userCourse[i].id == widget.course.id) {
-                            id = widget.course.id;
+                      onTap: () async {
+                        String? id;
+                        List<NotesModel> userNotes =
+                            context.read<UserProvider>().userNotes;
+                        for (int i = 0; i < userNotes.length; i++) {
+                          if (userNotes[i].title == widget.notes.title) {
+                            id = widget.notes.title;
                             break;
                           }
                         }
 
                         if (id == null) {
-                          Get.to(() =>
-                              ConfirmCoursePurchasePage(course: widget.course));
-                        } else {
-                          Get.to(() => AlreadyPurchasedPage());
+                          await Get.to<bool>(() =>
+                                  ConfirmNotesPurchase(notes: widget.notes))
+                              ?.whenComplete(() => setState(() {}));
                         }
                       },
                       child: Container(

@@ -1,40 +1,40 @@
-
 import 'package:course_app/models/course_model.dart';
 import 'package:course_app/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-class ConfirmPurchasePage extends StatefulWidget {
-  const ConfirmPurchasePage({super.key, required this.course});
+class ConfirmCoursePurchasePage extends StatefulWidget {
+  const ConfirmCoursePurchasePage({super.key, required this.course});
   final Course course;
 
   @override
-  State<ConfirmPurchasePage> createState() => _ConfirmPurchasePageState();
+  State<ConfirmCoursePurchasePage> createState() =>
+      _ConfirmCoursePurchasePageState();
 }
 
-class _ConfirmPurchasePageState extends State<ConfirmPurchasePage> {
+class _ConfirmCoursePurchasePageState extends State<ConfirmCoursePurchasePage> {
   final _razorpay = Razorpay();
   late Course course;
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    // Do something when payment succeeds
-    UserProvider().buyCourse(course);
-    Get.back();
-  }
+    void _handlePaymentSuccess(PaymentSuccessResponse response) {
+      // Do something when payment succeeds
+      UserProvider().buyCourse(course);
+      Get.back();
+    }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-    // Do something when payment fails
-    Get.back();
-    Get.snackbar('Error', 'Payment Failed ${response.message}',
-        backgroundColor: const Color.fromARGB(255, 179, 179, 179),
-        colorText: Colors.red,
-        duration: const Duration(seconds: 5));
-  }
+    void _handlePaymentError(PaymentFailureResponse response) {
+      // Do something when payment fails
+      Get.back();
+      Get.snackbar('Error', 'Payment Failed ${response.message}',
+          backgroundColor: const Color.fromARGB(255, 179, 179, 179),
+          colorText: Colors.red,
+          duration: const Duration(seconds: 5));
+    }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet was selected
-  }
+    void _handleExternalWallet(ExternalWalletResponse response) {
+      // Do something when an external wallet was selected
+    }
 
   @override
   void initState() {
@@ -46,7 +46,7 @@ class _ConfirmPurchasePageState extends State<ConfirmPurchasePage> {
 
     var options = {
       'key': 'rzp_test_QV6NcMIy4nKHCo',
-      'amount': widget.course.price * 10,
+      'amount': widget.course.price * 100,
       'name': 'Notepediax',
       'description': widget.course.description,
       'prefill': {'contact': '8888888888', 'email': 'ls8290519977@gmail.com'}
@@ -83,10 +83,6 @@ class AlreadyPurchasedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        
-      ),
-      body: const Center(child: Text(' ')));
+    return Scaffold(appBar: AppBar(), body: const Center(child: Text(' ')));
   }
 }
